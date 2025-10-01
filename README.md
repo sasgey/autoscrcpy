@@ -1,2 +1,2 @@
 # autoscrcpy
-launches scrcpy as soon device with debugging enabled is connected
+launches scrcpy as soon as a device with debugging enabled is connected
