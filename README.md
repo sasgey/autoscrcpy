@@ -32,3 +32,20 @@
 -   **On disconnect** → kills scrcpy for that device.
     
 -   **If scrcpy closes/crashes manually** → script notices `HasExited` and restarts it automatically.
+
+### Exclude Devices
+
+1.  Plug in the device.
+    
+2.  Run:
+    
+    `adb devices` 
+    
+    → You’ll see something like:
+    
+    `ZY224K8X7B device`
+    `R58M12ABC4 device` 
+    
+3.  Copy the unwanted device’s serial (e.g. `ZY224K8X7B`).
+    
+4.  Add it to the `$excludedDevices` array in the script.
