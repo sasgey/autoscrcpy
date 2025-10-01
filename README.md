@@ -15,14 +15,6 @@
     
  -   Add both `adb.exe` and `scrcpy.exe` to your PATH, or reference their full paths in the script.
 
-### Behavior
-
--   **On connect** → starts scrcpy at native resolution.
-    
--   **On disconnect** → kills scrcpy for that device.
-    
--   **If scrcpy closes/crashes manually** → script notices `HasExited` and restarts it automatically.
-
 ### Setup
 
 1.  Save as `AutoScrcpy.ps1`.
@@ -32,3 +24,11 @@
     `powershell.exe -ExecutionPolicy Bypass -File  "C:\Path\AutoScrcpy.ps1"` 
     
 3.  Set to **Run minimized** so the script stays quiet in the background.
+
+### Behavior
+
+-   **On connect** → starts scrcpy at native resolution.
+    
+-   **On disconnect** → kills scrcpy for that device.
+    
+-   **If scrcpy closes/crashes manually** → script notices `HasExited` and restarts it automatically.
