@@ -1,17 +1,37 @@
 $adbPath = "C:\scrcpy\adb.exe"
 $scrcpyPath = "C:\scrcpy\scrcpy.exe"
 
+# Excluded device IDs (serial numbers)
+# → Run "adb devices" once to see the IDs of your devices
+$excludedDevices = @(
+    "SERIAL_1",
+    "SERIAL_2"
+)
+
 # Track devices and their scrcpy process
 $deviceProcesses = @{}
 
 while ($true) {
-    # Get currently connected devices
+    # Get currently connected devices (only "device" state, ignore "unauthorized" etc.)
     $connected = & $adbPath devices | ForEach-Object {
         if ($_ -match "^(.*?)\s+device$") { $matches[1] }
     }
 
     # Handle new or restarted devices
     foreach ($deviceId in $connected) {
+        if ($excludedDevices -contains $deviceId) {
+            if ($deviceProcesses.ContainsKey($deviceId)) {
+                # If excluded device was tracked, make sure scrcpy is not running
+                try {
+                    if ($deviceProcesses[$deviceId] -and -not $deviceProcesses[$deviceId].HasExited) {
+                        $deviceProcesses[$deviceId].Kill()
+                    }
+                } catch {}
+                $deviceProcesses.Remove($deviceId) | Out-Null
+            }
+            continue
+        }
+
         if (-not $deviceProcesses.ContainsKey($deviceId)) {
             $deviceProcesses[$deviceId] = $null
         }
