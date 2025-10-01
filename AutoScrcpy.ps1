@@ -10,9 +10,16 @@ while ($true) {
         if ($_ -match "^(.*?)\s+device$") { $matches[1] }
     }
 
-    # Handle new devices
+    # Handle new or restarted devices
     foreach ($deviceId in $connected) {
         if (-not $deviceProcesses.ContainsKey($deviceId)) {
+            $deviceProcesses[$deviceId] = $null
+        }
+
+        $proc = $deviceProcesses[$deviceId]
+
+        # If no scrcpy process or process exited → start/restart it
+        if (-not $proc -or $proc.HasExited) {
             # Get resolution
             $wmOutput = & $adbPath -s $deviceId shell wm size
             $args = "-s $deviceId"
@@ -24,7 +31,7 @@ while ($true) {
                 Write-Output "[$deviceId] Launching scrcpy with default size"
             }
 
-            # Start scrcpy process and store it
+            # Start scrcpy process
             $proc = Start-Process $scrcpyPath -ArgumentList $args -PassThru
             $deviceProcesses[$deviceId] = $proc
         }
@@ -35,7 +42,9 @@ while ($true) {
         if ($connected -notcontains $id) {
             Write-Output "[$id] Disconnected → closing scrcpy"
             try {
-                $deviceProcesses[$id].Kill()
+                if ($deviceProcesses[$id] -and -not $deviceProcesses[$id].HasExited) {
+                    $deviceProcesses[$id].Kill()
+                }
             } catch {
                 Write-Output "[$id] Process already closed"
             }
